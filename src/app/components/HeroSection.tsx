@@ -30,7 +30,7 @@ export default function HeroSection() {
     // ─── Set initial states ───────────────────────────────────────────────────
     gsap.set(car, { x: -450, opacity: 0 });
     gsap.set(greenTrail, { scaleX: 0, transformOrigin: "left center" });
-    gsap.set(headline, { opacity: 0 });
+    gsap.set(headline, { clipPath: "inset(0% 100% 0% 0%)" });
     statRefs.forEach((ref) => {
       if (ref.current) gsap.set(ref.current, { opacity: 0, y: 40, scale: 0.85 });
     });
@@ -47,8 +47,8 @@ export default function HeroSection() {
       )
       .to(
         headline,
-        { opacity: 1, duration: 0.6, ease: "power2.out" },
-        "-=0.3"
+        { clipPath: `inset(0% ${100 - ((cWidth * 0.4) / window.innerWidth) * 100}% 0% 0%)`, duration: 0.6, ease: "power2.out" },
+        "<"
       );
 
     // ─── Scroll-driven animation ──────────────────────────────────────────────
@@ -76,6 +76,13 @@ export default function HeroSection() {
       scrollTl.to(
         greenTrail,
         { scaleX: (travel + carWidth * 0.4) / viewportW, ease: "none", duration: 10 },
+        0
+      );
+
+      // Headline reveals perfectly synced with the green trail
+      scrollTl.to(
+        headline,
+        { clipPath: `inset(0% ${100 - ((travel + carWidth * 0.4) / viewportW) * 100}% 0% 0%)`, ease: "none", duration: 10 },
         0
       );
 
@@ -305,7 +312,7 @@ export default function HeroSection() {
               position: "absolute",
             }}
           >
-            {/* Green trail — scaleX animated 0→1 from left */}
+            {/* Blue trail — scaleX animated 0→1 from left */}
             <div
               ref={greenTrailRef}
               id="green-trail"
@@ -315,7 +322,7 @@ export default function HeroSection() {
                 left: 0,
                 bottom: 0,
                 width: "100%",
-                backgroundColor: "#4BE04B",
+                backgroundColor: "#62CAEE",
                 transformOrigin: "left center",
                 zIndex: 1,
               }}
@@ -338,16 +345,20 @@ export default function HeroSection() {
             >
               <h1
                 style={{
-                  fontFamily: '"Impact", "Arial Black", sans-serif',
-                  fontWeight: 900,
-                  fontSize: "clamp(3rem, 9vw, 9rem)",
-                  color: "#ffffff", // solid white fill as seen in the image
-                  letterSpacing: "0.05em",
+                  fontFamily: "var(--font-oswald), sans-serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(4rem, 10vw, 10rem)",
+                  // Create the horizontally dashed font effect using a repeating linear gradient
+                  backgroundImage: "repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 4px, transparent 4px, transparent 7px)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  color: "transparent",
+                  letterSpacing: "0.06em",
                   whiteSpace: "nowrap",
                   lineHeight: 1,
                   textTransform: "uppercase",
                   userSelect: "none",
-                  transform: "skewX(-15deg)", // heavy forward lean for that aggressive racing look
+                  transform: "skewX(-15deg)", // heavy italic lean to match the dashed reference image
                 }}
               >
                 WELCOME ITZFIZZ
