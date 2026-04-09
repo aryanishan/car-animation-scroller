@@ -28,7 +28,7 @@ export default function HeroSection() {
     const statRefs = [stat1Ref, stat2Ref, stat3Ref, stat4Ref];
 
     // Set initial GSAP states
-    gsap.set(car, { x: -450, opacity: 0 });
+    gsap.set(car, { x: -450, yPercent: -50, opacity: 0 });
     gsap.set(greenTrail, { scaleX: 0, transformOrigin: "left center" });
     gsap.set(headline, { clipPath: "inset(0% 100% 0% 0%)" });
     statRefs.forEach((ref) => {
