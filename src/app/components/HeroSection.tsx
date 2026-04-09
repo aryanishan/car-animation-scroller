@@ -238,12 +238,14 @@ export default function HeroSection() {
           <div
             ref={stat1Ref}
             id="stat-1"
-            className="absolute rounded-2xl p-6 shadow-2xl"
+            className="absolute shadow-2xl italic"
             style={{
               top: "9%",
-              left: "36%",
-              width: "210px",
-              backgroundColor: "#B5E040",
+              left: "46%",
+              width: "max-content",
+              padding: "48px 64px",
+              borderRadius: "16px",
+              backgroundColor: "#FFB3D1",
               color: "#111",
             }}
           >
@@ -257,11 +259,13 @@ export default function HeroSection() {
           <div
             ref={stat2Ref}
             id="stat-2"
-            className="absolute rounded-2xl p-6 shadow-2xl"
+            className="absolute shadow-2xl italic"
             style={{
               top: "9%",
               right: "8%",
-              width: "210px",
+              width: "max-content",
+              padding: "48px 64px",
+              borderRadius: "16px",
               backgroundColor: "#292929",
               color: "#fff",
             }}
@@ -276,11 +280,13 @@ export default function HeroSection() {
           <div
             ref={stat3Ref}
             id="stat-3"
-            className="absolute rounded-2xl p-6 shadow-2xl"
+            className="absolute shadow-2xl italic"
             style={{
               bottom: "9%",
-              left: "36%",
-              width: "210px",
+              left: "8%",
+              width: "max-content",
+              padding: "48px 64px",
+              borderRadius: "16px",
               backgroundColor: "#62CAEE",
               color: "#111",
             }}
@@ -295,12 +301,14 @@ export default function HeroSection() {
           <div
             ref={stat4Ref}
             id="stat-4"
-            className="absolute rounded-2xl p-6 shadow-2xl"
+            className="absolute shadow-2xl italic"
             style={{
               bottom: "9%",
-              right: "8%",
-              width: "210px",
-              backgroundColor: "#EE6F28",
+              left: "36%",
+              width: "max-content",
+              padding: "48px 64px",
+              borderRadius: "16px",
+              backgroundColor: "#FFFFFF",
               color: "#111",
             }}
           >
