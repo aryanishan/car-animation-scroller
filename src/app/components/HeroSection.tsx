@@ -16,6 +16,7 @@ export default function HeroSection() {
   const stat2Ref = useRef<HTMLDivElement>(null);
   const stat3Ref = useRef<HTMLDivElement>(null);
   const stat4Ref = useRef<HTMLDivElement>(null);
+  const smokeContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -27,7 +28,7 @@ export default function HeroSection() {
     const statRefs = [stat1Ref, stat2Ref, stat3Ref, stat4Ref];
 
     // ─── Set initial states ───────────────────────────────────────────────────
-    gsap.set(car, { x: -350, opacity: 0 });
+    gsap.set(car, { x: -450, opacity: 0 });
     gsap.set(greenTrail, { scaleX: 0, transformOrigin: "left center" });
     gsap.set(headline, { opacity: 0 });
     statRefs.forEach((ref) => {
@@ -36,11 +37,12 @@ export default function HeroSection() {
 
     // ─── Intro animation — car drives in from off-screen left ─────────────────
     const introTl = gsap.timeline({ delay: 0.3 });
+    const cWidth = car.offsetWidth || 450;
     introTl
       .to(car, { x: 0, opacity: 1, duration: 1.1, ease: "power3.out" })
       .to(
         greenTrail,
-        { scaleX: 0.015, duration: 0.6, ease: "power2.out" },
+        { scaleX: (cWidth * 0.4) / window.innerWidth, duration: 0.6, ease: "power2.out" },
         "-=0.5"
       )
       .to(
@@ -53,16 +55,16 @@ export default function HeroSection() {
     const ctx = gsap.context(() => {
       const viewportW = window.innerWidth;
       const carWidth = car.offsetWidth;
-      // Car travels from 0 → (viewport - carWidth)
-      const travel = viewportW - carWidth;
+      // Car travels so that half of it remains visible at the end
+      const travel = viewportW - carWidth * 0.5;
 
       const scrollTl = gsap.timeline({
         scrollTrigger: {
           trigger: wrapper,
           start: "top top",
-          end: `+=${viewportW * 2.8}`,
+          end: `+=${viewportW * 1.2}`,
           pin: true,
-          scrub: 1.4,
+          scrub: 0,
           anticipatePin: 1,
         },
       });
@@ -70,10 +72,10 @@ export default function HeroSection() {
       // Car moves left → right
       scrollTl.to(car, { x: travel, ease: "none", duration: 10 }, 0);
 
-      // Green trail expands left → right behind the car
+      // Green trail expands perfectly synced with the back of the car
       scrollTl.to(
         greenTrail,
-        { scaleX: 1, ease: "none", duration: 10 },
+        { scaleX: (travel + carWidth * 0.4) / viewportW, ease: "none", duration: 10 },
         0
       );
 
@@ -105,6 +107,92 @@ export default function HeroSection() {
     };
   }, []);
 
+  // ─── Smoke effect on fast scroll ─────────────────────────────────────────
+  useEffect(() => {
+    let lastSmokeTime = 0;
+
+    function spawnSmoke(speed: number) {
+      const car = carRef.current;
+      const smokeContainer = smokeContainerRef.current;
+      if (!car || !smokeContainer) return;
+
+      const heroEl = document.getElementById("hero-section");
+      if (!heroEl) return;
+
+      const carRect = car.getBoundingClientRect();
+      const heroRect = heroEl.getBoundingClientRect();
+
+      // Car faces right → rear exhaust is on the left side
+      const rearX = carRect.left - heroRect.left + 28;
+      const centerY = carRect.top - heroRect.top + carRect.height * 0.52;
+
+      const count = Math.min(3 + Math.floor(speed / 90), 8);
+
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement("div");
+        const size = 22 + Math.random() * 32;
+        const offsetY = (Math.random() - 0.5) * carRect.height * 0.55;
+        const gray = Math.floor(140 + Math.random() * 95);
+        const alpha = 0.45 + Math.random() * 0.4;
+
+        Object.assign(particle.style, {
+          position: "absolute",
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, rgba(${gray},${gray},${gray},${alpha}) 0%, rgba(${gray},${gray},${gray},0) 70%)`,
+          left: `${rearX - size / 2}px`,
+          top: `${centerY - size / 2 + offsetY}px`,
+          pointerEvents: "none",
+          opacity: String(alpha),
+        });
+
+        smokeContainer.appendChild(particle);
+
+        const driftX = -(55 + Math.random() * 75);
+        const driftY = (Math.random() - 0.5) * 65;
+        const duration = 700 + Math.random() * 600;
+        const scale = 2.0 + Math.random() * 1.4;
+
+        particle.animate(
+          [
+            { transform: "scale(0.25)", opacity: String(alpha), offset: 0 },
+            {
+              transform: `scale(${scale}) translate(${driftX}px, ${driftY}px)`,
+              opacity: "0",
+              offset: 1,
+            },
+          ],
+          { duration, easing: "ease-out", fill: "forwards" }
+        );
+
+        setTimeout(() => {
+          // Guard: particle may have already been removed on unmount
+          if (particle.parentNode) particle.parentNode.removeChild(particle);
+        }, duration + 120);
+      }
+    }
+
+    function handleWheel(e: WheelEvent) {
+      const speed = Math.abs(e.deltaY);
+      const now = Date.now();
+      // Trigger smoke only on fast scrolls (threshold: 70px per event)
+      if (speed > 70 && now - lastSmokeTime > 55) {
+        spawnSmoke(speed);
+        lastSmokeTime = now;
+      }
+    }
+
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      // Clear all pending smoke particles on unmount to avoid stale DOM errors
+      if (smokeContainerRef.current) {
+        smokeContainerRef.current.innerHTML = "";
+      }
+    };
+  }, []);
+
   return (
     <>
       {/* ── Hero wrapper: creates scroll room and pins the hero ─── */}
@@ -115,6 +203,17 @@ export default function HeroSection() {
           className="relative w-full overflow-hidden"
           style={{ height: "100vh", backgroundColor: "#c9c9c9" }}
         >
+          {/* ── Smoke particles container (velocity-based effect) ── */}
+          <div
+            ref={smokeContainerRef}
+            id="smoke-container"
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: 15,
+            }}
+          />
 
           {/* ── Stat cards ──────────────────────────────────────── */}
           {/* Top-left lime: 58% */}
@@ -231,22 +330,24 @@ export default function HeroSection() {
                 inset: 0,
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent: "flex-start",
+                paddingLeft: "8vw",
                 zIndex: 2,
                 pointerEvents: "none",
               }}
             >
               <h1
                 style={{
-                  fontFamily: "var(--font-inter), Inter, sans-serif",
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
                   fontWeight: 900,
-                  fontSize: "clamp(2.5rem, 8.5vw, 8.5rem)",
-                  color: "#0c0c0c",
-                  letterSpacing: "0.06em",
+                  fontSize: "clamp(3rem, 9vw, 9rem)",
+                  color: "#ffffff", // solid white fill as seen in the image
+                  letterSpacing: "0.05em",
                   whiteSpace: "nowrap",
                   lineHeight: 1,
                   textTransform: "uppercase",
                   userSelect: "none",
+                  transform: "skewX(-15deg)", // heavy forward lean for that aggressive racing look
                 }}
               >
                 WELCOME ITZFIZZ
@@ -263,39 +364,16 @@ export default function HeroSection() {
               top: "50%",
               left: 0,
               transform: "translateY(-50%)",
-              width: "380px",
+              width: "450px",
               zIndex: 20,
             }}
           >
-            <CarImage style={{ width: "380px" }} />
+            <CarImage style={{ width: "450px" }} />
           </div>
         </div>
       </div>
 
-      {/* ── Below-fold section ────────────────────────────────────── */}
-      <div
-        id="below-fold"
-        className="flex flex-col items-center justify-center gap-4"
-        style={{
-          backgroundColor: "#c9c9c9",
-          minHeight: "60vh",
-          padding: "6rem 2rem",
-        }}
-      >
-        <h2
-          className="font-black uppercase"
-          style={{
-            fontSize: "clamp(2rem, 6vw, 5rem)",
-            letterSpacing: "0.12em",
-            color: "#1a1a1a",
-          }}
-        >
-          ITZFIZZ
-        </h2>
-        <p style={{ fontSize: "1.1rem", color: "#555", maxWidth: "420px", textAlign: "center" }}>
-          Delivering premium experiences — driven by data and designed for the future.
-        </p>
-      </div>
+
     </>
   );
 }
