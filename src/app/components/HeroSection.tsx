@@ -27,7 +27,7 @@ export default function HeroSection() {
 
     const statRefs = [stat1Ref, stat2Ref, stat3Ref, stat4Ref];
 
-    // ─── Set initial states ───────────────────────────────────────────────────
+    // Set initial GSAP states
     gsap.set(car, { x: -450, opacity: 0 });
     gsap.set(greenTrail, { scaleX: 0, transformOrigin: "left center" });
     gsap.set(headline, { clipPath: "inset(0% 100% 0% 0%)" });
@@ -35,7 +35,7 @@ export default function HeroSection() {
       if (ref.current) gsap.set(ref.current, { opacity: 0, y: 40, scale: 0.85 });
     });
 
-    // ─── Intro animation — car drives in from off-screen left ─────────────────
+    // Intro animation sequence
     const introTl = gsap.timeline({ delay: 0.3 });
     const cWidth = car.offsetWidth || 450;
     introTl
@@ -51,7 +51,7 @@ export default function HeroSection() {
         "<"
       );
 
-    // ─── Scroll-driven animation ──────────────────────────────────────────────
+    // Scroll-bound timeline execution
     const ctx = gsap.context(() => {
       const viewportW = window.innerWidth;
       const carWidth = car.offsetWidth;
@@ -114,7 +114,7 @@ export default function HeroSection() {
     };
   }, []);
 
-  // ─── Smoke effect on fast scroll ─────────────────────────────────────────
+  // Smoke exhaust particle effect logic
   useEffect(() => {
     let lastSmokeTime = 0;
 
@@ -140,7 +140,6 @@ export default function HeroSection() {
 
       // Increase density and volume significantly for fast scrolls
       if (speed > 150) {
-        // Aggressively spike particle count up to 30
         count = Math.min(8 + Math.floor((speed - 150) / 15), 30);
         sizeScale = 1.6; // 60% larger base particles
         driftScale = 1.6; // 60% wider dispersion
@@ -213,7 +212,7 @@ export default function HeroSection() {
 
   return (
     <>
-      {/* ── Hero wrapper: creates scroll room and pins the hero ─── */}
+      {/* Main hero wrapper and sticky pin target */}
       <div ref={wrapperRef} id="hero-wrapper" className="relative w-full">
         {/* The sticky hero viewport */}
         <div
@@ -221,7 +220,7 @@ export default function HeroSection() {
           className="relative w-full overflow-hidden"
           style={{ height: "100vh", backgroundColor: "#c9c9c9" }}
         >
-          {/* ── Smoke particles container (velocity-based effect) ── */}
+          {/* Smoke particle overlay container */}
           <div
             ref={smokeContainerRef}
             id="smoke-container"
@@ -233,8 +232,7 @@ export default function HeroSection() {
             }}
           />
 
-          {/* ── Stat cards ──────────────────────────────────────── */}
-          {/* Top-left lime: 58% */}
+          {/* Statistics highlight cards */}
           <div
             ref={stat1Ref}
             id="stat-1"
@@ -255,7 +253,6 @@ export default function HeroSection() {
             </p>
           </div>
 
-          {/* Top-right charcoal: 27% */}
           <div
             ref={stat2Ref}
             id="stat-2"
@@ -276,7 +273,6 @@ export default function HeroSection() {
             </p>
           </div>
 
-          {/* Bottom-left sky-blue: 23% */}
           <div
             ref={stat3Ref}
             id="stat-3"
@@ -297,7 +293,6 @@ export default function HeroSection() {
             </p>
           </div>
 
-          {/* Bottom-right orange: 40% */}
           <div
             ref={stat4Ref}
             id="stat-4"
@@ -318,7 +313,7 @@ export default function HeroSection() {
             </p>
           </div>
 
-          {/* ── Road track (black horizontal band centered) ─────── */}
+          {/* Horizontal animated track band */}
           <div
             id="road-track"
             className="absolute left-0 right-0"
@@ -367,7 +362,6 @@ export default function HeroSection() {
                   fontFamily: "var(--font-oswald), sans-serif",
                   fontWeight: 700,
                   fontSize: "clamp(4rem, 10vw, 10rem)",
-                  // Create the horizontally dashed font effect using a repeating linear gradient
                   backgroundImage: "repeating-linear-gradient(to bottom, #ffffff 0px, #ffffff 4px, transparent 4px, transparent 7px)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -377,7 +371,7 @@ export default function HeroSection() {
                   lineHeight: 1,
                   textTransform: "uppercase",
                   userSelect: "none",
-                  transform: "skewX(-15deg)", // heavy italic lean to match the dashed reference image
+                  transform: "skewX(-15deg)",
                 }}
               >
                 WELCOME ITZFIZZ
@@ -385,7 +379,7 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* ── Car — absolutely positioned at vertical center of hero ─ */}
+          {/* Hero subject entity */}
           <div
             ref={carRef}
             id="car"
