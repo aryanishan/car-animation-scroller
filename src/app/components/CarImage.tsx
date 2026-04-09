@@ -8,7 +8,7 @@ export default function CarImage({ style }: { style?: React.CSSProperties }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/car-animation-scroller/bugatti-top-view-removebg-preview.png"
+      src="/bugatti-top-view-removebg-preview.png"
       alt="Bugatti supercar top-down view"
       style={{
         display: "block",
