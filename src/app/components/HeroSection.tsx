@@ -133,12 +133,23 @@ export default function HeroSection() {
       const rearX = carRect.left - heroRect.left + 28;
       const centerY = carRect.top - heroRect.top + carRect.height * 0.52;
 
-      const count = Math.min(3 + Math.floor(speed / 90), 8);
+      // Normal slow scrolling yields ~3-4 particles.
+      let count = Math.min(3 + Math.floor(speed / 90), 8);
+      let sizeScale = 1;
+      let driftScale = 1;
+
+      // Increase density and volume significantly for fast scrolls
+      if (speed > 150) {
+        // Aggressively spike particle count up to 30
+        count = Math.min(8 + Math.floor((speed - 150) / 15), 30);
+        sizeScale = 1.6; // 60% larger base particles
+        driftScale = 1.6; // 60% wider dispersion
+      }
 
       for (let i = 0; i < count; i++) {
         const particle = document.createElement("div");
-        const size = 22 + Math.random() * 32;
-        const offsetY = (Math.random() - 0.5) * carRect.height * 0.55;
+        const size = (22 + Math.random() * 32) * sizeScale;
+        const offsetY = ((Math.random() - 0.5) * carRect.height * 0.55) * driftScale;
         const gray = Math.floor(140 + Math.random() * 95);
         const alpha = 0.45 + Math.random() * 0.4;
 
@@ -156,10 +167,10 @@ export default function HeroSection() {
 
         smokeContainer.appendChild(particle);
 
-        const driftX = -(55 + Math.random() * 75);
-        const driftY = (Math.random() - 0.5) * 65;
+        const driftX = -(55 + Math.random() * 75) * driftScale;
+        const driftY = ((Math.random() - 0.5) * 65) * driftScale;
         const duration = 700 + Math.random() * 600;
-        const scale = 2.0 + Math.random() * 1.4;
+        const scale = (2.0 + Math.random() * 1.4) * sizeScale;
 
         particle.animate(
           [
